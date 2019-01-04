@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid" id="app">   
-    
+    <date-picker></date-picker>
   </div>
 </template>
 
@@ -9,8 +9,8 @@ import DatePicker from "./DatePicker";
 
 export default {
   name: 'App',
-  component: {
-    'date-picker': DatePicker.datePicker
+  components: {
+    DatePicker
   }
 }
 </script>
