@@ -176,19 +176,6 @@ export default {
 </script>
 
 <style>
-.slide-fade-enter-active {
-  transition: all .3s ease;
-}
-.slide-fade-leave-active {
-  /* transition: all .0s cubic-bezier(1.0, 0.5, 0.8, 1.0); */
-  display: none;
-}
-.slide-fade-enter, .slide-fade-leave-to
-/* .slide-fade-leave-active for below version 2.1.8 */ {
-  transform: translateY(10px);
-  opacity: 0;
-}
-
 .date-picker input:focus, textarea:focus, button:focus {
   outline: none;
 }
@@ -230,6 +217,8 @@ export default {
   background-color: #fff;
   color: #666;
   overflow: hidden;
+  clear:both;
+  position: absolute;
 }
 .date-single {
   width: 320px;
