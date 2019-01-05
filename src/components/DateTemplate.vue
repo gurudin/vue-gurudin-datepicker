@@ -119,9 +119,17 @@
     </div>
 
     <div class="date-picker-footer">
-      <input type="text" value="12">
-      :
-      <input type="text" value="00">
+      <div @mouseover="activeArrow" @mouseout="deactiveArrow">
+        <input type="text" value="12" @focus="$event.target.select()">
+        <span class="arrowUp" @click="changeTime('hours', 'up')"></span>
+        <span class="arrowDown" @click="changeTime('hours', 'down')"></span>
+      </div>
+      <div class="separated">:</div>
+      <div @mouseover="activeArrow" @mouseout="deactiveArrow">
+        <input type="text" value="00" @focus="$event.target.select()">
+        <span class="arrowUp" @click="changeTime('minutes', 'up')"></span>
+        <span class="arrowDown" @click="changeTime('minutes', 'down')"></span>
+      </div>
       <input type="button" value="PM">
     </div>
   </div>
@@ -133,6 +141,13 @@ export default {
   data () {
     return {
       picker: 'days',
+      init: {
+        year: '',
+        month: '',
+        hour: '',
+        minutes: '',
+        second: '',
+      },
     };
   },
   methods: {
@@ -141,6 +156,19 @@ export default {
         this.picker = 'days';
       } else {
         this.picker = type;
+      }
+    },
+    activeArrow(event) {
+      event.currentTarget.getElementsByTagName('span')[0].style.opacity = 1;
+      event.currentTarget.getElementsByTagName('span')[1].style.opacity = 1;
+    },
+    deactiveArrow(event) {
+      event.currentTarget.getElementsByTagName('span')[0].style.opacity = 0;
+      event.currentTarget.getElementsByTagName('span')[1].style.opacity = 0;
+    },
+    changeTime(type, direction) {
+      if (type) {
+
       }
     }
   }
@@ -161,7 +189,7 @@ export default {
   opacity: 0;
 }
 
-.date-picker input:focus, textarea:focus {
+.date-picker input:focus, textarea:focus, button:focus {
   outline: none;
 }
 .date-picker ul,.date-picker ul li {
@@ -272,11 +300,11 @@ export default {
 }
 .date-picker-header span.active {
   color: #ffffff;
-  background-color: #17a2b8;
+  background-color: #3cc5c7;
 }
 .date-picker-header span:hover {
   color: #ffffff;
-  background-color: #17a2b8;
+  background-color: #3cc5c7;
 }
 
 .date-picker-body {
@@ -327,11 +355,65 @@ export default {
 .date-picker-footer {
   border-top: 1px solid #e2e2e2;
 }
+.date-picker-footer div {
+  width: 125px;
+  height: 49px;
+  float: left;
+  position: relative;
+}
+.date-picker-footer div span {
+  position: absolute;
+  opacity: 0;
+}
+.date-picker-footer div span:after {
+  display: block;
+  content: "";
+  position: absolute;
+}
+.date-picker-footer div span.arrowUp:after {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid rgba(57,57,57,.6);
+  top: 26%;
+}
+.date-picker-footer span.arrowDown:after {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid rgba(57,57,57,.6);
+  top: 40%;
+}
+.date-picker-footer div span.arrowUp{
+  top: 0;
+  right: 0;
+  width: 14px;
+  padding: 0 4px 0 2px;
+  height: 25px;
+  line-height: 50%;
+  cursor: pointer;
+  border: 1px solid rgba(57,57,57,.15);
+  box-sizing: border-box;
+}
+.date-picker-footer div span.arrowDown{
+  bottom: -1px;
+  right: 0;
+  width: 14px;
+  padding: 0 4px 0 2px;
+  height: 25px;
+  line-height: 50%;
+  cursor: pointer;
+  border: 1px solid rgba(57,57,57,.15);
+  box-sizing: border-box;
+}
+.date-picker-footer div.separated {
+  width: 5px;
+  line-height: 50px;
+  font-weight: bold;
+}
 .date-picker-footer input {
   border: none;
   text-align: center;
   width: 125px;
-  height: 49px;
+  height: 50px;
   font-size: 16px;
 }
 .date-picker-footer input[type='button'] {
