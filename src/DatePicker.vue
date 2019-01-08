@@ -35,19 +35,17 @@ export default {
       var calendarBox = document.getElementById("calendarBox");
       var chk = 0;
 
-      // 点击整个界面关闭弹窗 
-      document.onclick = function(e)  {
+      // 点击整个界面关闭弹窗
+      document.onclick = function(e) {
         if (chk != 1) {
-          console.log('page');
           _this.showPicker = 0;
         } else {
           chk = 0;
         }
-      }  
+      }
         
       // 防止点击弹窗也关闭弹窗，需要防止其关闭
-      calendarBox.onclick = function()  {
-        console.log('calendarBox');
+      calendarBox.onclick = function() {
         chk = 1;
         return false;
       }

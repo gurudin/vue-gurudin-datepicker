@@ -136,18 +136,14 @@
 </template>
 
 <script>
+import date from "../utils/date";
+
 export default {
   name: 'DateTemplate',
   data () {
     return {
       picker: 'days',
-      init: {
-        year: '',
-        month: '',
-        hour: '',
-        minutes: '',
-        second: '',
-      },
+      date: date,
     };
   },
   methods: {
@@ -170,7 +166,14 @@ export default {
       if (type) {
 
       }
+    },
+    test() {
+      alert(this.date.date);
+      this.date.init('10/9/2018 10:01:00 +0800');
     }
+  },
+  created() {
+    
   }
 }
 </script>
