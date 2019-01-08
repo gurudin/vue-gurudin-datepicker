@@ -3,17 +3,17 @@
     <div class="date-picker-header">
       <ul>
         <li class="date-time">
-          <span :class="{'active':picker=='years'}" @click="togglePanel('years')">2019年</span>
-          <span :class="{'active':picker=='months'}" @click="togglePanel('months')">06月</span>
+          <span :class="{'active':picker=='years'}" @click="togglePanel('years')">{{date.fullYear}}年</span>
+          <span :class="{'active':picker=='months'}" @click="togglePanel('months')">{{date.month}}月</span>
         </li>
         <li class="date-prev-year">
-          <button><i></i></button>
+          <button @click="prev"><i></i></button>
         </li>
         <li class="date-now">
           <button><i></i></button>
         </li>
         <li class="date-next-year">
-          <button><i></i></button>
+          <button @click="next"><i></i></button>
         </li>
       </ul>
     </div>
@@ -29,53 +29,11 @@
           <li class="title">五</li>
           <li class="title">六</li>
 
-          <li class="muted">1</li>
-          <li class="muted">2</li>
-          <li class="muted">3</li>
-          <li>4</li>
-          <li>5</li>
-          <li>6</li>
-          <li>7</li>
+          <li class="muted" v-for="item in date.gridDays()['prev']">{{item.day}}</li>
+          
+          <li v-for="item in date.gridDays()['current']" :class="{'active':item.active}">{{item.day}}</li>
 
-          <li>8</li>
-          <li>9</li>
-          <li>10</li>
-          <li>11</li>
-          <li>12</li>
-          <li>13</li>
-          <li>14</li>
-
-          <li>15</li>
-          <li>16</li>
-          <li>17</li>
-          <li>18</li>
-          <li>19</li>
-          <li>20</li>
-          <li>21</li>
-
-          <li>22</li>
-          <li>23</li>
-          <li>24</li>
-          <li>25</li>
-          <li>26</li>
-          <li>27</li>
-          <li>28</li>
-
-          <li>29</li>
-          <li>30</li>
-          <li>31</li>
-          <li>32</li>
-          <li>33</li>
-          <li>34</li>
-          <li>35</li>
-
-          <li>36</li>
-          <li>37</li>
-          <li>38</li>
-          <li>39</li>
-          <li>40</li>
-          <li class="muted">6</li>
-          <li class="muted">7</li>
+          <li class="muted" v-for="item in date.gridDays()['next']">{{item.day}}</li>
         </ul>
 
         <ul class="months-picker" v-if="picker=='months'" key="months">
@@ -120,13 +78,13 @@
 
     <div class="date-picker-footer">
       <div @mouseover="activeArrow" @mouseout="deactiveArrow">
-        <input type="text" value="12" @focus="$event.target.select()">
+        <input type="text" :value="currentDate.getHours()" @focus="$event.target.select()">
         <span class="arrowUp" @click="changeTime('hours', 'up')"></span>
         <span class="arrowDown" @click="changeTime('hours', 'down')"></span>
       </div>
       <div class="separated">:</div>
       <div @mouseover="activeArrow" @mouseout="deactiveArrow">
-        <input type="text" value="00" @focus="$event.target.select()">
+        <input type="text" :value="currentDate.getMinutes()" @focus="$event.target.select()">
         <span class="arrowUp" @click="changeTime('minutes', 'up')"></span>
         <span class="arrowDown" @click="changeTime('minutes', 'down')"></span>
       </div>
@@ -145,6 +103,21 @@ export default {
       picker: 'days',
       date: date,
     };
+  },
+  props: {
+    value: {
+      type: null,
+      required: false,
+    },
+  },
+  computed: {
+    currentDate() {
+      if (typeof this.value == 'undefined') {
+        return new Date();
+      } else {
+        return new Date(this.value.replace(/-/g, '/'));
+      }
+    }
   },
   methods: {
     togglePanel(type) {
@@ -167,13 +140,21 @@ export default {
 
       }
     },
-    test() {
-      alert(this.date.date);
-      this.date.init('10/9/2018 10:01:00 +0800');
+    prev() {
+      // prev year month
+      if (this.picker == 'days') {
+        this.date.init(this.date.offsetMonthDate(-1));
+      }
+    },
+    next() {
+      // next year month
+      if (this.picker == 'days') {
+        this.date.init(this.date.offsetMonthDate(1));
+      }
     }
   },
   created() {
-    
+    this.date.init(this.currentDate);
   }
 }
 </script>
@@ -309,6 +290,10 @@ export default {
   line-height: 35px;
   color: #343a40;
   cursor: pointer;
+}
+.date-picker-body ul.days-picker li.active {
+  color: #ffffff!important;
+  background-color: #3cc5c7;
 }
 .date-picker-body ul.days-picker li.title {
   cursor: unset;
