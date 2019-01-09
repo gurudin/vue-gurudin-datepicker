@@ -3,8 +3,8 @@
     <div class="date-picker-header">
       <ul>
         <li class="date-time">
-          <span :class="{'active':picker=='years'}" @click="togglePanel('years')">{{date.fullYear}}年</span>
-          <span :class="{'active':picker=='months'}" @click="togglePanel('months')">{{date.month}}月</span>
+          <span :class="{'active':picker=='years'}" @click="togglePanel('years')">{{currentDate.fullYear}}年</span>
+          <span :class="{'active':picker=='months'}" @click="togglePanel('months')">{{currentDate.month}}月</span>
         </li>
         <li class="date-prev-year">
           <button @click="prev"><i></i></button>
@@ -78,13 +78,13 @@
 
     <div class="date-picker-footer">
       <div @mouseover="activeArrow" @mouseout="deactiveArrow">
-        <input type="text" :value="currentDate.getHours()" @focus="$event.target.select()">
+        <input type="text" :value="currentDate.hours" @focus="$event.target.select()">
         <span class="arrowUp" @click="changeTime('hours', 'up')"></span>
         <span class="arrowDown" @click="changeTime('hours', 'down')"></span>
       </div>
       <div class="separated">:</div>
       <div @mouseover="activeArrow" @mouseout="deactiveArrow">
-        <input type="text" :value="currentDate.getMinutes()" @focus="$event.target.select()">
+        <input type="text" :value="currentDate.minutes" @focus="$event.target.select()">
         <span class="arrowUp" @click="changeTime('minutes', 'up')"></span>
         <span class="arrowDown" @click="changeTime('minutes', 'down')"></span>
       </div>
@@ -113,10 +113,12 @@ export default {
   computed: {
     currentDate() {
       if (typeof this.value == 'undefined') {
-        return new Date();
+        var dateObj = new Date();
       } else {
-        return new Date(this.value.replace(/-/g, '/'));
+        var dateObj = new Date(this.value.replace(/-/g, '/'));
       }
+      
+      return this.date.dateToArray(dateObj);
     }
   },
   methods: {
@@ -154,7 +156,7 @@ export default {
     }
   },
   created() {
-    this.date.init(this.currentDate);
+    this.date.init(this.date.arrayToDate(this.currentDate));
   }
 }
 </script>

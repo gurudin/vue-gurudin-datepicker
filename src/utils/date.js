@@ -3,18 +3,21 @@ export default {
   fullYear: Number,
   month: Number,
   day: Number,
+  week: Number,
   init(dateTime = '') {
     if (dateTime != '') {
-      // this.date = new Date(dateTime.replace(/-/g, '/'));
       var tmpDate = dateTime.getFullYear() + '-' + (dateTime.getMonth() + 1) + '-01';
     } else {
       var tmpDate = this.date.getFullYear() + '-' + (this.date.getMonth() + 1) + '-01';
     }
     this.date = new Date(tmpDate);
 
-    this.fullYear = this.date.getFullYear();
-    this.month = this.date.getMonth() + 1;
-    this.day = this.date.getDate();
+    var dateArray = this.dateToArray(this.date);
+
+    this.fullYear = dateArray.fullYear;
+    this.month = dateArray.month;
+    this.day = dateArray.day;
+    this.week = dateArray.week;
   },
   gridDays() {
     var days = {
@@ -116,7 +119,28 @@ export default {
    * @return {Array}
    */
   dateToArray(dateObj) {
+    return {
+      fullYear: dateObj.getFullYear(),
+      month: dateObj.getMonth() + 1,
+      day: dateObj.getDate(),
+      week: dateObj.getDay(),
+      hours: dateObj.getHours(),
+      minutes: dateObj.getMinutes(),
+      seconds: dateObj.getSeconds(),
+    };
+  },
+  /**
+   * array转换date对象
+   * 
+   * @param {Array} dateArray
+   * 
+   * @return {Date}
+   */
+  arrayToDate(array) {
+    var dateStr = array.fullYear + '-' + array.month + '-' + array.day
+      + ' ' + array.hours + ':' + array.minutes + ':' + array.seconds;
 
+    return new Date(dateStr.replace(/-/g, '/'));
   },
   /**
    * 获取偏移月
