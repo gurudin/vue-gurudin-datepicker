@@ -46,26 +46,9 @@
         </ul>
 
         <ul class="years-picker" v-if="picker=='years'" key="years">
-          <li>2007年</li>
-          <li>2008年</li>
-          <li>2009年</li>
-          <li>2010年</li>
-          <li>2011年</li>
-          <li>2012年</li>
-          <li>2013年</li>
-          <li>2014年</li>
-          <li>2015年</li>
-          <li>2016年</li>
-          <li>2017年</li>
-          <li>2018年</li>
-          <li>2007年</li>
-          <li>2008年</li>
-          <li>2009年</li>
-          <li>2010年</li>
-          <li>2011年</li>
-          <li>2012年</li>
-          <li>2013年</li>
-          <li>2014年</li>
+          <li v-for="year in date.gridYears()"
+            :class="{'active':isActive(year, 'year')}"
+            @click="changeYear(year)">{{year}}{{i18n.year}}</li>
         </ul>
       </transition-group>
     </div>
@@ -112,7 +95,7 @@ export default {
     language: {
       type: String,
       required: false,
-      default: 'en'
+      default: 'zh'
     }
   },
   computed: {
@@ -142,6 +125,10 @@ export default {
 
       if (type == 'month') {
         return this.date.month == item;
+      }
+
+      if (type == 'year') {
+        return this.date.fullYear == item;
       }
     },
     changeTime(type, direction) {
@@ -199,6 +186,12 @@ export default {
     changeMonth(month) {
       this.date.month = month;
       this.picker = 'days';
+      this.date.init(this.date.offsetMonthDate());
+    },
+    changeYear(year) {
+      this.date.fullYear = year;
+      this.picker = 'days';
+      this.date.init(this.date.offsetMonthDate());
     }
   },
   created() {

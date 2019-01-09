@@ -18,6 +18,16 @@ export default {
     this.month = dateArray.month;
     this.day = dateArray.day;
     this.week = dateArray.week;
+
+    this.gridYears()
+  },
+  gridYears(year = this.fullYear) {
+    var years = [];
+    for (let i = year-9; i <= year+10; i++) {
+      years.push(i);
+    }
+    
+    return years;
   },
   gridDays() {
     var days = {
