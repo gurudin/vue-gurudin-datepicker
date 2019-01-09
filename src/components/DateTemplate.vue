@@ -2,15 +2,19 @@
   <div class="date-picker date-single">
     <div class="date-picker-header">
       <ul>
-        <li class="date-time">
-          <span :class="{'active':picker=='years'}" @click="togglePanel('years')">{{currentDate.fullYear}}年</span>
-          <span :class="{'active':picker=='months'}" @click="togglePanel('months')">{{currentDate.month}}月</span>
+        <li class="date-time" v-if="language == 'en'">
+          <span :class="{'active':picker=='months'}" @click="togglePanel('months')">{{i18n.months[date.month - 1]}}</span>
+          <span :class="{'active':picker=='years'}" @click="togglePanel('years')">{{date.fullYear}}</span>
+        </li>
+        <li class="date-time" v-else>
+          <span :class="{'active':picker=='years'}" @click="togglePanel('years')">{{date.fullYear}}{{i18n.year}}</span>
+          <span :class="{'active':picker=='months'}" @click="togglePanel('months')">{{date.month}}{{i18n.month}}</span>
         </li>
         <li class="date-prev-year">
           <button @click="prev"><i></i></button>
         </li>
         <li class="date-now">
-          <button><i></i></button>
+          <button @click="reset"><i></i></button>
         </li>
         <li class="date-next-year">
           <button @click="next"><i></i></button>
@@ -21,34 +25,24 @@
     <div class="date-picker-body">
       <transition-group tag="span" name="slide-fade">
         <ul class="days-picker" v-if="picker=='days'" key="days">
-          <li class="title">日</li>
-          <li class="title">一</li>
-          <li class="title">二</li>
-          <li class="title">三</li>
-          <li class="title">四</li>
-          <li class="title">五</li>
-          <li class="title">六</li>
+          <li class="title" v-for="(week,inx) in i18n.weeks">{{week}}</li>
 
-          <li class="muted" v-for="item in date.gridDays()['prev']">{{item.day}}</li>
+          <li class="muted"
+            v-for="item in date.gridDays()['prev']"
+            :class="{'active':isActive(item, 'day')}">{{item.day}}</li>
           
-          <li v-for="item in date.gridDays()['current']" :class="{'active':item.active}">{{item.day}}</li>
+          <li v-for="item in date.gridDays()['current']"
+            :class="{'active':isActive(item, 'day')}">{{item.day}}</li>
 
-          <li class="muted" v-for="item in date.gridDays()['next']">{{item.day}}</li>
+          <li class="muted"
+            v-for="item in date.gridDays()['next']"
+            :class="{'active':isActive(item, 'day')}">{{item.day}}</li>
         </ul>
 
         <ul class="months-picker" v-if="picker=='months'" key="months">
-          <li>一月</li>
-          <li>二月</li>
-          <li>三月</li>
-          <li>四月</li>
-          <li>五月</li>
-          <li>六月</li>
-          <li>七月</li>
-          <li>八月</li>
-          <li>九月</li>
-          <li>十月</li>
-          <li>十一月</li>
-          <li>十二月</li>
+          <li v-for="(month,inx) in i18n.months"
+            :class="{'active':isActive(inx+1, 'month')}"
+            @click="changeMonth(inx + 1)">{{month}}</li>
         </ul>
 
         <ul class="years-picker" v-if="picker=='years'" key="years">
@@ -78,23 +72,25 @@
 
     <div class="date-picker-footer">
       <div @mouseover="activeArrow" @mouseout="deactiveArrow">
-        <input type="text" :value="currentDate.hours" @focus="$event.target.select()">
+        <input type="text" v-model="currentValue.hours" @focus="$event.target.select()">
         <span class="arrowUp" @click="changeTime('hours', 'up')"></span>
         <span class="arrowDown" @click="changeTime('hours', 'down')"></span>
       </div>
       <div class="separated">:</div>
       <div @mouseover="activeArrow" @mouseout="deactiveArrow">
-        <input type="text" :value="currentDate.minutes" @focus="$event.target.select()">
+        <input type="text" v-model="currentValue.minutes" @focus="$event.target.select()">
         <span class="arrowUp" @click="changeTime('minutes', 'up')"></span>
         <span class="arrowDown" @click="changeTime('minutes', 'down')"></span>
       </div>
-      <input type="button" value="PM">
+      <input type="button" :value="currentValue.hours >= 12 ? 'PM' : 'AM'">
     </div>
   </div>
 </template>
 
 <script>
 import date from "../utils/date";
+import zh from "../utils/zh.json";
+import en from "../utils/en.json";
 
 export default {
   name: 'DateTemplate',
@@ -102,24 +98,24 @@ export default {
     return {
       picker: 'days',
       date: date,
+      currentValue: Array,
+      i18n: Object,
     };
   },
   props: {
     value: {
       type: null,
       required: false,
+      default: ''
+      // default: '2018-07-11 12:30'
     },
+    language: {
+      type: String,
+      required: false,
+      default: 'en'
+    }
   },
   computed: {
-    currentDate() {
-      if (typeof this.value == 'undefined') {
-        var dateObj = new Date();
-      } else {
-        var dateObj = new Date(this.value.replace(/-/g, '/'));
-      }
-      
-      return this.date.dateToArray(dateObj);
-    }
   },
   methods: {
     togglePanel(type) {
@@ -137,9 +133,51 @@ export default {
       event.currentTarget.getElementsByTagName('span')[0].style.opacity = 0;
       event.currentTarget.getElementsByTagName('span')[1].style.opacity = 0;
     },
-    changeTime(type, direction) {
-      if (type) {
+    isActive(item, type) {
+      if (type == 'day') {
+        return item.year == this.currentValue.fullYear
+          && item.month == this.currentValue.month
+          && item.day == this.currentValue.day;
+      }
 
+      if (type == 'month') {
+        return this.date.month == item;
+      }
+    },
+    changeTime(type, direction) {
+      if (type == 'hours') {
+        if (direction == 'up') {
+          if (Number(this.currentValue.hours) > 0) {
+            this.currentValue.hours = Number(this.currentValue.hours) - 1 > 9
+              ? Number(this.currentValue.hours) - 1
+              : '0' + (Number(this.currentValue.hours) - 1);
+          }
+        }
+        if (direction == 'down') {
+          if (Number(this.currentValue.hours) < 24) {
+            this.currentValue.hours = Number(this.currentValue.hours) + 1 > 9
+              ? Number(this.currentValue.hours) + 1
+              : '0' + (Number(this.currentValue.hours) + 1);
+          }
+        }
+      }
+
+      if (type == 'minutes') {
+        if (direction == 'up') {
+          if (Number(this.currentValue.minutes) > 0) {
+            this.currentValue.minutes = Number(this.currentValue.minutes) - 5 > 9
+              ? Number(this.currentValue.minutes) - 5
+              : '0' + (Number(this.currentValue.minutes) - 5);
+          }
+        }
+
+        if (direction == 'down') {
+          if (Number(this.currentValue.minutes) < 60) {
+            this.currentValue.minutes = Number(this.currentValue.minutes) + 5 > 9
+              ? Number(this.currentValue.minutes) + 5
+              : '0' + (Number(this.currentValue.minutes) + 5);
+          }
+        }
       }
     },
     prev() {
@@ -153,10 +191,27 @@ export default {
       if (this.picker == 'days') {
         this.date.init(this.date.offsetMonthDate(1));
       }
+    },
+    reset() {
+      this.currentValue = this.date.dateToArray(this.value != '' ? new Date(this.value.replace(/-/g, '/')) : new Date()); 
+      this.date.init(this.date.arrayToDate(this.currentValue));
+    },
+    changeMonth(month) {
+      this.date.month = month;
+      this.picker = 'days';
     }
   },
   created() {
-    this.date.init(this.date.arrayToDate(this.currentDate));
+    this.reset();
+
+    switch (this.language) {
+      case 'en':
+        this.i18n = en;
+        break;
+      default:
+        this.i18n = zh;
+        break;
+    }
   }
 }
 </script>
@@ -293,7 +348,9 @@ export default {
   color: #343a40;
   cursor: pointer;
 }
-.date-picker-body ul.days-picker li.active {
+.date-picker-body ul.days-picker li.active,
+.date-picker-body ul.months-picker li.active,
+.date-picker-body ul.years-picker li.active {
   color: #ffffff!important;
   background-color: #3cc5c7;
 }

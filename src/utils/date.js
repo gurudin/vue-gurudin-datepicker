@@ -124,8 +124,8 @@ export default {
       month: dateObj.getMonth() + 1,
       day: dateObj.getDate(),
       week: dateObj.getDay(),
-      hours: dateObj.getHours(),
-      minutes: dateObj.getMinutes(),
+      hours: dateObj.getHours() > 9 ? dateObj.getHours() : '0' + dateObj.getHours(),
+      minutes: dateObj.getMinutes() > 9 ? dateObj.getMinutes() : '0' + dateObj.getMinutes(),
       seconds: dateObj.getSeconds(),
     };
   },
