@@ -154,7 +154,7 @@ export default {
           if (Number(this.currentValue.minutes) > 0) {
             this.currentValue.minutes = Number(this.currentValue.minutes) - 5 > 9
               ? Number(this.currentValue.minutes) - 5
-              : '0' + (Number(this.currentValue.minutes) - 5);
+              : '0' + (Number(this.currentValue.minutes) - 5 < 0 ? 0 : Number(this.currentValue.minutes) - 5);
           }
         }
 
@@ -163,6 +163,9 @@ export default {
             this.currentValue.minutes = Number(this.currentValue.minutes) + 5 > 9
               ? Number(this.currentValue.minutes) + 5
               : '0' + (Number(this.currentValue.minutes) + 5);
+            if (this.currentValue.minutes > 60) {
+              this.currentValue.minutes = 60;
+            }
           }
         }
       }
